@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.Autonomous
 
 import android.graphics.Color
-import com.acmerobotics.dashboard.FtcDashboard
+//import com.acmerobotics.dashboard.FtcDashboard
 import com.qualcomm.hardware.lynx.LynxModule
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.hardware.configuration.LynxConstants
@@ -22,10 +22,11 @@ import org.firstinspires.ftc.teamcode.Variables.system_funcs.arm
 import org.firstinspires.ftc.teamcode.Variables.system_funcs.camera
 import org.firstinspires.ftc.teamcode.Variables.system_funcs.controlHub
 import org.firstinspires.ftc.teamcode.Variables.system_funcs.currentcommand
-import org.firstinspires.ftc.teamcode.Variables.system_funcs.dash
-import org.firstinspires.ftc.teamcode.Variables.system_funcs.expansionHub
+//import org.firstinspires.ftc.teamcode.Variables.system_funcs.dash
+//import org.firstinspires.ftc.teamcode.Variables.system_funcs.expansionHub
 import org.firstinspires.ftc.teamcode.Variables.system_funcs.hardwareMap
 import org.firstinspires.ftc.teamcode.Variables.system_funcs.imew
+import org.firstinspires.ftc.teamcode.Variables.system_funcs.init_auto
 import org.firstinspires.ftc.teamcode.Variables.system_funcs.init_systems
 import org.firstinspires.ftc.teamcode.Variables.system_funcs.init_teleop
 import org.firstinspires.ftc.teamcode.Variables.system_funcs.localizer
@@ -34,6 +35,7 @@ import org.firstinspires.ftc.teamcode.Variables.system_funcs.pipeline
 //import org.firstinspires.ftc.teamcode.Variables.system_funcs.pipeline
 import org.firstinspires.ftc.teamcode.Variables.system_funcs.pp
 import org.firstinspires.ftc.teamcode.Variables.system_funcs.telemetryPacket
+//import org.firstinspires.ftc.teamcode.Variables.system_funcs.telemetryPacket
 import org.firstinspires.ftc.teamcode.Variables.system_funcs.tp
 import org.firstinspires.ftc.teamcode.Variables.system_funcs.update
 import org.firstinspires.ftc.teamcode.hardware.Controller
@@ -42,16 +44,14 @@ import org.openftc.easyopencv.OpenCvCameraRotation
 import java.lang.Thread.sleep
 
 object auto_funcs {
-
     fun setupAuto(lom: LinearOpMode, path: Command?) {
-        init_teleop(lom)
-        autoupdate_tp("CASE", autocase)
+        init_teleop(lom, false)
+        autoupdate_tp("CASE", pipeline.case)
         autoupdate_tp("ISRED", isRed)
-        camera.stop()
-        arm.fourbar.position = 1.0
-        sleep(500)
-        arm.fourbar.position = 0.7
         var runningcommand = path
+        lom.waitForStart()
+        camera.stop()
+
         while (!lom.isStopRequested) {
 
             if(runningcommand != null){

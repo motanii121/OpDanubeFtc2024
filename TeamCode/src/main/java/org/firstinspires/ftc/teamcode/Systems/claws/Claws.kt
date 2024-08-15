@@ -20,9 +20,15 @@ class Claws {
         rclaw.position = rclawOpenPos
         rotator.position = clawRotateInit
     }
+
     fun grab(){
         lclaw.position = lclawClosePos
         rclaw.position = rclawClosePos
+    }
+
+    fun grabauto(){
+        lclaw.position = 0.84
+        rclaw.position = 0.06
     }
 
     fun droppurple(){

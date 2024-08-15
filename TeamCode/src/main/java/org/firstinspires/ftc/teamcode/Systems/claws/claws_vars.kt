@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.Systems.claws
 
-import com.acmerobotics.dashboard.config.Config
+//import com.acmerobotics.dashboard.config.Config
 
-@Config
+//@Config
 object claws_vars {
     @JvmField
     var lclawOpenPos: Double = 0.3
@@ -15,5 +15,5 @@ object claws_vars {
     @JvmField
     var clawRotateStep: Double = 0.06
     @JvmField
-    var clawRotateMaxPos: Double = 0.6
+    var clawRotateMaxPos: Double = 0.61
 }

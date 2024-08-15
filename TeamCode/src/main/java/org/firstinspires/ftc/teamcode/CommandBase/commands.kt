@@ -1,12 +1,44 @@
 package org.firstinspires.ftc.teamcode.CommandBase
 
+import com.qualcomm.hardware.ams.AMSColorSensor.Wait
 import org.firstinspires.ftc.teamcode.Autonomous.Pose
 import org.firstinspires.ftc.teamcode.Autonomous.auto_vars.isRed
+import org.firstinspires.ftc.teamcode.CommandBase.auto_sequences_red.preload0
+import org.firstinspires.ftc.teamcode.CommandBase.auto_sequences_red.preload1
+import org.firstinspires.ftc.teamcode.CommandBase.auto_sequences_red.preload2
+import org.firstinspires.ftc.teamcode.CommandBase.commands.follow
+import org.firstinspires.ftc.teamcode.CommandBase.commands.goinit
+import org.firstinspires.ftc.teamcode.CommandBase.commands.lowerslides
+import org.firstinspires.ftc.teamcode.CommandBase.commands.raiseslides
+import org.firstinspires.ftc.teamcode.CommandBase.commands.yello
+import org.firstinspires.ftc.teamcode.CommandBase.commands.yellowsequence
 import org.firstinspires.ftc.teamcode.Pathing.Trajectory
+import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.Park0Blue
+import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.Park0Red
+import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.Park1Blue
+import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.Park1Red
+import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.Park2Blue
+import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.Park2Red
+import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.Preload0Blue
+import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.Preload0Red
+import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.Preload1Blue
+import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.Preload1Red
+import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.Preload2Blue
+import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.Preload2Red
+import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.PreloadtoBack0Blue
+import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.PreloadtoBack0Red
+import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.PreloadtoBack1Blue
+import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.PreloadtoBack1Red
+import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.PreloadtoBack2Red
+import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.anotherintermediarytraj2Red
+import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.anotherintermediarytraj2blue
 import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.bluebackdrop
 import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.bluepreload
 import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.droptostack
 import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.failsafe
+import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.intermediarytraj0Blue
+import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.intermediarytraj0Red
+import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.intermediarytraj2Red
 import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.park
 import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.redbackdrop
 import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.redpreload
@@ -32,29 +64,33 @@ object commands{
 
     fun transfer(): Command{
         return SequentialCommand(
-            InstantCommand { arm.goInit() },
-            InstantCommand { arm.fourbar.position = 0.35 },
+            InstantCommand { claws.rotator.position = 0.05},
+            InstantCommand { claws.drop()},
+            InstantCommand { arm.goInit() }, //sets the pos of the 2 arm servos
+            InstantCommand { arm.fourbar.position = 0.4 },
             InstantCommand { claws.rotator.position = 0.05},
             InstantCommand { intake.intakeServo.position = 0.8},
             WaitUntilCommand { intake.intakeServo.position == 0.8 },
-            InstantCommand { intake.intakeMotor.power = intakeMotorPower},
+            InstantCommand { intake.intakeMotor.power = intakeMotorPower}, //little intake action
             SleepCommand(0.2),
             InstantCommand { intake.stop() },
             InstantCommand { intake.lidServo.position = lidOpenPos },
-            //WaitUntilCommand { intake.lidServo.position == lidOpenPos },
-            SleepCommand(0.7),
-            InstantCommand { arm.goDown() },
-            InstantCommand { arm.fourbar.position = 0.20 },
-            SleepCommand(0.5),
+            SleepCommand(0.3), //insane amount of sleeps bcs testing reasons
+            InstantCommand { arm.fourbar.position = 0.4 }, //dont care that its the same position lol
+            InstantCommand { arm.goDown() }, //same as goinit
+            SleepCommand(0.25),
             InstantCommand { claws.grab() },
-            SleepCommand(0.5),
+            SleepCommand(0.25),
             InstantCommand { arm.goInit() },
-            //InstantCommand { arm.fourbar.position = 0.2},
-            //InstantCommand{ arm.fourbar.position = fourbarfinalpos },
-            SleepCommand(0.2),
-            //InstantCommand { arm.fourbar.position =  0.8},
-            SleepCommand(0.5),
+            SleepCommand(0.3),
             InstantCommand { intake.lidServo.position = lidClosePos }
+        )
+    }
+
+    fun failsafe(): Command{
+        return SequentialCommand(
+            InstantCommand {arm.goInit()},
+            InstantCommand { arm.fourbar.position = 0.4}
         )
     }
 
@@ -62,18 +98,28 @@ object commands{
         return SequentialCommand(
             InstantCommand { arm.goUp() },
             SleepCommand(0.1),
-            InstantCommand { arm.fourbar.position =  fourbarfinalpos}
+            InstantCommand { arm.fourbar.position =  0.87}
         )
     }
 
     fun goinit(): Command{
         return SequentialCommand(
-            InstantCommand { claws.rotator.position = 0.05},
+            SleepCommand(0.2),
             InstantCommand { claws.drop() },
             SleepCommand(0.1),
+            InstantCommand { claws.rotator.position = 0.05},
+            lowerslidesteleop(slides.lslide.currentPosition > 1),
+            //InstantCommand { arm.fourbar.position = 0.4},
             InstantCommand { arm.goInit() },
-            SleepCommand(0.2),
-            InstantCommand { arm.fourbar.position =  0.4 }
+            InstantCommand { arm.fourbar.position = 0.4},
+            )
+    }
+
+    fun transferfromup(): Command{
+        return SequentialCommand(
+            goinit(),
+            SleepCommand(0.1),
+            transfer()
         )
     }
 
@@ -82,15 +128,25 @@ object commands{
     fun raiseslides(i: Int): Command{
         return SequentialCommand(
             InstantCommand { slides.up() },
-            SleepCommand(0.2 * (3 - i/2)),
+            SleepCommand(0.2 ),
             InstantCommand { slides.stop() },
         )
+    }
+
+    fun lowerslidesteleop(areslidesup: Boolean): Command{
+
+        return if(areslidesup)
+            SequentialCommand(
+                RunUntilCommand(InstantCommand{ slides.down() }, InstantCommand{ slides.lslide.currentPosition < 10 })
+            )
+        else
+            InstantCommand{}
     }
 
     fun lowerslides(i: Int): Command{
         return SequentialCommand(
             InstantCommand { slides.down() },
-            SleepCommand(0.2 * (3-i/2)),
+            SleepCommand(0.2 ),
             InstantCommand { slides.stop() },
         )
     }
@@ -128,53 +184,6 @@ object commands{
         )
     }
 
-    fun preload(): Command{
-        return SequentialCommand(
-            /*InstantCommand{(if(isRed) redpreload else bluepreload)},
-            porpl(),
-            follow(if(isRed) redbackdrop else bluebackdrop),
-            yello()*/
-            InstantCommand{pp.followtraj(Trajectory(Pose(0.0,0.0,0.0), Pose(0.0,0.0,0.0)))},
-            WaitUntilCommand { !pp.busy},
-            SleepCommand(0.5),
-            InstantCommand { arm.goPreloadDown()},
-            InstantCommand {arm.fourbar.position = 0.5},
-            InstantCommand { arm.goPreloadDown()},
-            //InstantCommand { arm.goUp() },
-            InstantCommand { arm.goPreloadDown()},
-            InstantCommand{pp.followtraj(redpreload)},
-            InstantCommand { arm.goPreloadDown()},
-            WaitUntilCommand{!pp.busy},
-            SleepCommand(0.2),
-            InstantCommand { arm.goPreloadDown()},
-            InstantCommand { arm.fourbar.position = 0.9 },
-            SleepCommand(0.5),
-            InstantCommand { claws.droppurple() },
-            SleepCommand(0.3),
-            InstantCommand { arm.goUp()},
-            SleepCommand(0.4),
-            InstantCommand {pp.followtraj(redbackdrop)},
-            WaitUntilCommand{!pp.busy},
-            //SleepCommand(3.0),
-            raiseslides(3),
-            InstantCommand { arm.goYellowDown()},
-            yello(),
-            SleepCommand(1.0),
-            lowerslides(3),
-            goinit(),
-            InstantCommand {pp.followtraj(Trajectory(Pose(50.0, 110.0, 3 * PI / 2), Pose(-50.0, 110.0, 3 * PI / 2)))},
-            WaitUntilCommand{!pp.busy}
-            /*InstantCommand {pp.followtraj(Trajectory(Pose(30.0, 110.0, 3 * PI / 2), Pose(10.0, 0.0, PI / 2) ))},
-            WaitUntilCommand{!pp.busy},
-            InstantCommand {pp.followtraj(Trajectory(Pose(10.0, 0.0, PI / 2), Pose(10.0, -200.0, PI / 2) ))},
-            WaitUntilCommand{!pp.busy},
-            InstantCommand {pp.followtraj(Trajectory(Pose(10.0, -200.0, PI / 2), Pose(30.0, -250.0, PI / 2)))},
-            WaitUntilCommand{!pp.busy},
-
-             */
-        )
-    }
-
     //TRANSFER
     fun autotransfer(cycle: Int): Command{
         return SequentialCommand(
@@ -198,6 +207,16 @@ object commands{
         )
     }
 
+    fun yellowsequence(): Command{
+        return SequentialCommand(
+            raiseslides(3),
+            yello(),
+            SleepCommand(1.0),
+            lowerslides(3),
+            goinit(),
+        )
+    }
+
     //CYCLES
     fun cycle(cycle: Int): Command{
         return SequentialCommand(
@@ -210,13 +229,289 @@ object commands{
         )
     }
 
-    fun auto(): Command{
+    fun auto(case: Int): Command{
+        var preload =  if(case == 0) preload0() else if(case == 1) preload1() else preload2()
         return SequentialCommand(
-            preload(),
+            preload,
             cycle(3),
             cycle(2),
             cycle(1),
             InstantCommand { pp.followtraj(park) }
         )
     }
+}
+
+object auto_sequences_red{
+    //BACKDROP RED
+    fun preload0(): Command{
+        return SequentialCommand(
+            //start
+            follow(Trajectory(Pose(), Pose())),
+
+            //setup arm
+            InstantCommand{arm.fourbar.position = 0.7},
+            SleepCommand(0.5),
+            InstantCommand { arm.goPreloadDown()},
+
+            //go to preload 0 (towards backdrop)
+            follow(Preload0Red),
+            SleepCommand(0.2),
+
+            //straighten wrist
+            InstantCommand { arm.goPreloadDown()},
+            InstantCommand { arm.fourbar.position = 1.0 },
+            SleepCommand(0.5),
+            InstantCommand{claws.rotator.position = 0.05},
+
+            //drop purple
+            InstantCommand { claws.droppurple() },
+            SleepCommand(0.3),
+
+            //prepare for yellow
+            InstantCommand { arm.goUp()},
+            InstantCommand { arm.fourbar.position = 0.95},
+            SleepCommand(0.4),
+
+            //move out of the way to not de-score purple
+            follow(intermediarytraj0Red),
+            SleepCommand(0.2),
+
+            //go to backdrop
+            follow(PreloadtoBack0Red),
+
+            //drop yellow
+            yellowsequence(),
+
+            //park
+            follow(Park0Red)
+        )
+    }
+
+    //CENTER RED
+    fun preload1(): Command{
+        return SequentialCommand(
+            //start
+            follow(Trajectory(Pose(), Pose())),
+
+            //setup arm
+            InstantCommand{arm.fourbar.position = 0.7},
+            SleepCommand(0.5),
+            InstantCommand { arm.goPreloadDown()},
+
+            //go to preload 1 (center)
+            follow(Preload1Red),
+            SleepCommand(0.2),
+
+            //put arm down and straighten wrist
+            InstantCommand { arm.goPreloadDown()},
+            InstantCommand { arm.fourbar.position = 1.0 },
+            SleepCommand(0.5),
+            InstantCommand{claws.rotator.position = 0.05},
+
+            //drop
+            InstantCommand { claws.droppurple() },
+            SleepCommand(0.3),
+
+            //prepare for yellow
+            InstantCommand { arm.goUp()},
+            InstantCommand { arm.fourbar.position = 0.95},
+            SleepCommand(0.4),
+
+            //go to backboard
+            follow(PreloadtoBack1Red),
+
+            //put yellow
+            yellowsequence(),
+
+            //reset and park
+            follow(Park1Red)
+        )
+    }
+
+    //TRUSS RED
+    fun preload2(): Command{
+        return SequentialCommand(
+            //start
+            follow(Trajectory(Pose(), Pose())),
+
+            //setup arm
+            InstantCommand{arm.fourbar.position = 0.7},
+            SleepCommand(0.5),
+            InstantCommand { arm.goPreloadDown()},
+
+            //go to preload 2 (towards trusses)
+            follow(Preload2Red),
+
+            //allign to the spike mark, cannot do it in 1 path because otherwise i'd hit the truss
+            follow(anotherintermediarytraj2Red),
+            SleepCommand(0.2),
+
+            //straighten wrist
+            InstantCommand { arm.goPreloadDown()},
+            InstantCommand { arm.fourbar.position = 1.0 },
+            SleepCommand(0.5),
+            InstantCommand{claws.rotator.position = 0.05},
+
+            //drop purple
+            InstantCommand { claws.droppurple() },
+            SleepCommand(0.3),
+
+            //setup for yellow
+            InstantCommand { arm.goUp()},
+            InstantCommand { arm.fourbar.position = 0.95},
+            SleepCommand(0.4),
+
+            //due to the fact that i've got an imperfect pid paired with a pid to point, going straight up to the backdrop would
+            //make me hit it, so i make the robot go to an intermediary point between the two to soften the pathing
+            follow(intermediarytraj2Red),
+            SleepCommand(0.2),
+
+            //go to backdrop
+            follow(Preload2Red),
+
+            //drop yellow
+            yellowsequence(),
+
+            //reset and park
+            follow(Park2Red)
+        )
+    }
+}
+
+object auto_sequences_blue{
+    //BACKDROP BLUE
+    fun preload0blue(): Command{
+        return SequentialCommand(
+            //start
+            follow(Trajectory(Pose(), Pose())),
+
+            //setup arm
+            InstantCommand{arm.fourbar.position = 0.7},
+            SleepCommand(0.5),
+            InstantCommand { arm.goPreloadDown()},
+
+            //go to preload 0 (towards backdrop)
+            follow(Preload0Blue),
+            SleepCommand(0.2),
+
+            //straighten wrist
+            InstantCommand { arm.goPreloadDown()},
+            InstantCommand { arm.fourbar.position = 1.0 },
+            SleepCommand(0.5),
+            InstantCommand{claws.rotator.position = 0.05},
+
+            //drop purple
+            InstantCommand { claws.droppurple() },
+            SleepCommand(0.3),
+
+            //prepare for yellow
+            InstantCommand { arm.goUp()},
+            InstantCommand { arm.fourbar.position = 0.95},
+            SleepCommand(0.4),
+
+            //move out of the way to not de-score purple
+            follow(intermediarytraj0Blue),
+            SleepCommand(0.2),
+
+            //go to backdrop
+            follow(PreloadtoBack0Blue),
+
+            //drop yellow
+            yellowsequence(),
+
+            //park
+            follow(Park0Blue)
+        )
+    }
+
+    //CENTER BLUE
+    fun preload1blue(): Command{
+        return SequentialCommand(
+            //start
+            follow(Trajectory(Pose(), Pose())),
+
+            //setup arm
+            InstantCommand{arm.fourbar.position = 0.7},
+            SleepCommand(0.5),
+            InstantCommand { arm.goPreloadDown()},
+
+            //go to preload 1 (center)
+            follow(Preload1Blue),
+            SleepCommand(0.2),
+
+            //put arm down and straighten wrist
+            InstantCommand { arm.goPreloadDown()},
+            InstantCommand { arm.fourbar.position = 1.0 },
+            SleepCommand(0.5),
+            InstantCommand{claws.rotator.position = 0.05},
+
+            //drop
+            InstantCommand { claws.droppurple() },
+            SleepCommand(0.3),
+
+            //prepare for yellow
+            InstantCommand { arm.goUp()},
+            InstantCommand { arm.fourbar.position = 0.95},
+            SleepCommand(0.4),
+
+            //go to backboard
+            follow(PreloadtoBack1Blue),
+
+            //put yellow
+            yellowsequence(),
+
+            //reset and park
+            follow(Park1Blue)
+        )
+    }
+
+    //TRUSS BLUE
+    fun preload2blue(): Command{
+        return SequentialCommand(
+            //start
+            follow(Trajectory(Pose(), Pose())),
+
+            //setup arm
+            InstantCommand{arm.fourbar.position = 0.7},
+            SleepCommand(0.5),
+            InstantCommand { arm.goPreloadDown()},
+
+            //go to preload 2 (towards trusses)
+            follow(Preload2Blue),
+
+            //allign to the spike mark, cannot do it in 1 path because otherwise i'd hit the truss
+            follow(anotherintermediarytraj2blue),
+            SleepCommand(0.2),
+
+            //straighten wrist
+            InstantCommand { arm.goPreloadDown()},
+            InstantCommand { arm.fourbar.position = 1.0 },
+            SleepCommand(0.5),
+            InstantCommand{claws.rotator.position = 0.05},
+
+            //drop purple
+            InstantCommand { claws.droppurple() },
+            SleepCommand(0.3),
+
+            //setup for yellow
+            InstantCommand { arm.goUp()},
+            InstantCommand { arm.fourbar.position = 0.95},
+            SleepCommand(0.4),
+
+            //due to the fact that i've got an imperfect pid paired with a pid to point, going straight up to the backdrop would
+            //make me hit it, so i make the robot go to an intermediary point between the two to soften the pathing
+            follow(anotherintermediarytraj2blue),
+            SleepCommand(0.2),
+
+            //go to backdrop
+            follow(Preload2Blue),
+
+            //drop yellow
+            yellowsequence(),
+
+            //reset and park
+            follow(Park2Blue)
+        )
+    }
+
 }

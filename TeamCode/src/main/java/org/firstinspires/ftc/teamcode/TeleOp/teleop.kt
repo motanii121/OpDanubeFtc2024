@@ -53,6 +53,7 @@ import org.firstinspires.ftc.teamcode.Variables.system_funcs
 import org.firstinspires.ftc.teamcode.Variables.system_funcs.arm
 import org.firstinspires.ftc.teamcode.Variables.system_funcs.camera
 import org.firstinspires.ftc.teamcode.Variables.system_funcs.claws
+import org.firstinspires.ftc.teamcode.Variables.system_funcs.controller
 import org.firstinspires.ftc.teamcode.Variables.system_funcs.currentcommand
 import org.firstinspires.ftc.teamcode.Variables.system_funcs.dash
 import org.firstinspires.ftc.teamcode.Variables.system_funcs.drivetrain
@@ -99,28 +100,12 @@ var ishanging: Boolean = false
 var headingcorrectionpid = PIDF(PIDCOEF(0.0, 0.0, 0.0, 0.0))
 
 @TeleOp
-class testcumoneda: LinearOpMode(){
-
-    override fun runOpMode() {
-        init_teleop(this)
-        //localizer = ThreeWheelLocalizer(hardwareMap)
-        //localizer.init()
-        waitForStart()
-        while(!isStopRequested){
-            drivetrain.dummydriverobotcentric()
-          //  localizer.update()
-        }
-    }
-
-}
-
-@TeleOp
 class teleopSENSOR: LinearOpMode(){
     lateinit var sensor: ColorSensor
     var isnotseeing: Boolean = false
     var ep = ElapsedTime()
     override fun runOpMode() {
-        init_teleop(this)
+        init_teleop(this, false)
         sensor = ColorSensor()
 
         waitForStart()
@@ -133,7 +118,6 @@ class teleopSENSOR: LinearOpMode(){
                     gamepad2.rumble(200)
                 }
             }
-
             autoupdate_tp(tp, "RIGHTSENSOR", "${sensor.rsensor.red()}" +" ${sensor.rsensor.blue()}" + " ${sensor.rsensor.green()}" + " ${sensor.rsensor.alpha()}")
             autoupdate_tp(tp, "LEFTSENSOR", "${sensor.lsensor.red()}" +" ${sensor.lsensor.blue()}" + " ${sensor.lsensor.green()}" + " ${sensor.lsensor.alpha()}")
         }
@@ -144,9 +128,8 @@ class teleopSENSOR: LinearOpMode(){
 class teleopHAIDEEEEEEEEE: LinearOpMode(){
     var x: Int = 0
     override fun runOpMode() {
-        lateinit var sensor: ColorSensor
-        init_teleop(this)
-        sensor = ColorSensor()
+        init_teleop(this, false)
+        val sensor = ColorSensor()
         var ep = ElapsedTime()
         var RAAAAAAAAAH: Boolean = false
         var rah: Boolean = false
@@ -157,15 +140,13 @@ class teleopHAIDEEEEEEEEE: LinearOpMode(){
         var ishanging2: Boolean = false
         var isnotrotatingleft: Boolean = false
         var isnotrotatingright: Boolean = false
+        var islidup: Boolean = false
+        var isfailsafing = false
+        var k = 0
+        var headingcorrectionpid = PIDF(PIDCOEF(koef.p, koef.i, koef.d, koef.f))
+        var targetheading: Double = 0.0
         currentcommand = null
-        //var runningcommand: Command? = commands.fixservo()
         waitForStart()
-        camera.stop()
-        /*if(runningcommand !=  null){
-            if(runningcommand.run(telemetryPacket)){
-                runningcommand = null
-            }
-        }*/
 
         while(!isStopRequested){
 
@@ -174,13 +155,16 @@ class teleopHAIDEEEEEEEEE: LinearOpMode(){
                     ep.reset()
                     gamepad2.rumble(200)
                     gamepad1.rumble(200)
-                   // currentcommand = commands.transfer()
                 }
             }
 
             //TRANSFER TO INIT
-            if(gamepad2.a && !RAAAAAAAAAH){
-
+            if(gamepad2.a && !RAAAAAAAAAH && sensor.got2pixels()){
+                currentcommand = if(arm.isUp){
+                    commands.transferfromup()
+                } else{
+                    commands.transfer()
+                }
                 /*
                 golden sequence
 
@@ -195,9 +179,6 @@ class teleopHAIDEEEEEEEEE: LinearOpMode(){
                 arm.goInit()
                 sleep(500) //350
                 intake.lidServo.position = lidClosePos*/
-                sleep(300)
-
-                currentcommand = commands.transfer()
             }
             RAAAAAAAAAH = gamepad2.a
 
@@ -214,17 +195,24 @@ class teleopHAIDEEEEEEEEE: LinearOpMode(){
             raaaaaaaah = gamepad2.x
 
             //DRIVETRAIN
-            // drivetrain.dummydriverobotcentric()
-            drivetrain.gm0drive(gamepad1.left_trigger.toDouble())
+            if(abs(gamepad1.right_stick_x) > 0.05){
+                targetheading = imew.yaw
+                ep.reset()
+            } else {
+                while(ep.milliseconds() <= 200){
+                    targetheading = imew.yaw
+                }
+            }
+            drivetrain.gm0drive(- if(abs(angDiff(targetheading, imew.yaw)) >= angletolerance) headingcorrectionpid.update(angDiff(targetheading, imew.yaw)) else 0.0,gamepad1.left_trigger.toDouble())
 
             //INTAKE
             if(gamepad1.right_bumper && !isintaking) {
                // autoupdate_tp(tp, "alo intake", "da")
-                intake.intakeMotor.power = -1.0
+                intake.intakeMotor.power = 1.0
             }
 
             if(gamepad1.left_bumper && !isintaking2) {
-                intake.intakeMotor.power = 1.0
+                intake.intakeMotor.power = -1.0
             }
 
             if((!gamepad1.left_bumper && isintaking2) || (!gamepad1.right_bumper && isintaking)){
@@ -262,38 +250,60 @@ class teleopHAIDEEEEEEEEE: LinearOpMode(){
             }
             isnotinitpos = gamepad1.a
 
+            if (arm.isUp) {
+                slides.run()
+            } else if (sensor.got2pixels()) {
+                if(abs(gamepad2.right_stick_y) > 0.01) {
+                    currentcommand = commands.transfer()
+                }
+            }
 
-            slides.run()
 
-            if(gamepad2.left_trigger > 0.5 && !isnotrotatingleft){
-                claws.rotator.position += 0.1
+            if(gamepad2.left_trigger > 0.6 && !isnotrotatingleft && arm.isUp){
+                claws.rotator.position += 0.15
                 if(claws.rotator.position > clawRotateMaxPos){
                     claws.rotator.position = clawRotateInit
                 }
             }
-            isnotrotatingleft = gamepad2.left_trigger > 0.5
+            isnotrotatingleft = gamepad2.left_trigger > 0.6
 
-            if(gamepad2.right_trigger > 0.5 && !isnotrotatingright){
-                claws.rotator.position -= 0.1
-                if(claws.rotator.position <  clawRotateInit){
-                    claws.rotator.position = clawRotateInit
+            if(gamepad2.right_trigger > 0.6 && !isnotrotatingright && arm.isUp){
+                if(claws.rotator.position >  clawRotateInit){
+                    claws.rotator.position -= 0.15
                 }
             }
-            isnotrotatingright = gamepad2.right_trigger > 0.5
+            isnotrotatingright = gamepad2.right_trigger > 0.6
 
-            if(gamepad2.dpad_down && !ishanging) {
+            if(gamepad2.dpad_down && !ishanging && arm.isUp) {
                 slides.lslide.power = -1.0
                 slides.rslide.power = 1.0
                 sleep(3000)
             }
             ishanging = gamepad2.dpad_down
 
+            if(gamepad2.dpad_left && !islidup){
+                if(k == 0){
+                    intake.lidServo.position = lidOpenPos
+                    k = 1
+                }
+                else{
+                    intake.lidServo.position = lidClosePos
+                    k = 0
+                }
+            }
+            islidup = gamepad2.dpad_left
+
+            if(gamepad2.triangle && !isfailsafing){
+                currentcommand = commands.failsafe()
+            }
+            isfailsafing = gamepad2.triangle
+
             if(currentcommand != null){
                 if(currentcommand!!.run(telemetryPacket)){
                     currentcommand = null
                 }
             }
-
+            autoupdate_tp("LSLIDE", slides.lslide.currentPosition)
             update()
         }
     }
@@ -303,7 +313,7 @@ class teleopHAIDEEEEEEEEE: LinearOpMode(){
 class teleopcapac: LinearOpMode(){
 
     override fun runOpMode() {
-        init_teleop(this)
+        init_teleop(this, false)
         drivetrain = Drivetrain()
         val ep = ElapsedTime()
         var targetheading: Double = 0.0
@@ -336,22 +346,9 @@ class teleopcapac: LinearOpMode(){
     }
 }
 
-@TeleOp
-class vreaupreload: LinearOpMode(){
-    override fun runOpMode() {
-        init_teleop(this)
-        //arm = Arm()
-        waitForStart()
-        camera.stop()
-        while(!isStopRequested){
-            arm.fourbar.position = fourbarinit
-            arm.rarm.position = rarmInit
-            arm.larm.position = larmInit
-            update()
-        }
-    }
-}
 
+
+//lene
 @Config
 object koef{
     @JvmField

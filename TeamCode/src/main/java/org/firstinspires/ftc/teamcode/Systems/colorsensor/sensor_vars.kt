@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.Systems.colorsensor
 
-import com.acmerobotics.dashboard.config.Config
+//import com.acmerobotics.dashboard.config.Config
 
-@Config
+//@Config
 object sensor_vars{
     @JvmField
     var red: Int = 0

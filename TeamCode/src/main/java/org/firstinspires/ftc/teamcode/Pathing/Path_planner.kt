@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.Variables.system_funcs.arm
 import org.firstinspires.ftc.teamcode.Variables.system_funcs.claws
 import org.firstinspires.ftc.teamcode.Variables.system_funcs.pp
 
-@Config
+//@Config
 object path_planner {
     fun test_linie(vals: test_linie): Command {
         return SequentialCommand(

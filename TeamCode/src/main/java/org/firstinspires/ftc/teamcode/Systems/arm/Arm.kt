@@ -35,6 +35,10 @@ class Arm {
     private val MPinit = motionprofiler(MPinitVelocity, MPinitAcceleration, MPinitDecceleration)
     private val MPdown = motionprofiler(MPdownVelocity, MPdownAcceleration, MPdownDecceleration)
 
+    var isUp = false
+    var isInit = true
+    var isDown = false
+
     fun init(){
         fourbar.position = 0.4
         rarm.position = rarmInit
@@ -45,28 +49,27 @@ class Arm {
         //fourbar.position = fourbarinit
         rarm.position = rarmDown
         larm.position = larmDown
-
+        isUp = false
+        isInit = false
+        isDown = true
         //autoupdate_tp(tp, "brat jos", "yurrrr")
     }
 
     fun goUp(){
         rarm.position = rarmUp
         larm.position = larmUp
+        isUp = true
+        isInit = false
+        isDown = false
         //autoupdate_tp(tp, "brat sus", "yurrrr")
     }
 
     fun goInit(){
         rarm.position = rarmInit
         larm.position = larmInit
-
-    }
-
-    fun fourbarBackdrop(){
-        fourbar.position = fourbarfinalpos
-    }
-
-    fun fourbarInit(){
-        fourbar.position = fourbarinit
+        isUp = false
+        isInit = true
+        isDown = false
     }
 
     fun goPreloadDown(){
@@ -79,21 +82,6 @@ class Arm {
         rarm.position = 0.78
         larm.position = 0.16
         fourbar.position = 0.75
-    }
-
-    fun goInitMP(){
-        MPinit.setMotion(rarm.position, rarmInit, 0.0)
-        MPinit.setMotion(larm.position, larmInit, 0.0)
-    }
-
-    fun goUpMP(){
-        MPup.setMotion(rarm.position, rarmUp, 0.0)
-        MPup.setMotion(larm.position, larmUp, 0.0)
-    }
-
-    fun goDownMP(){
-        MPdown.setMotion(rarm.position, rarmDown, 0.0)
-        MPdown.setMotion(larm.position, larmDown, 0.0)
     }
 
 }

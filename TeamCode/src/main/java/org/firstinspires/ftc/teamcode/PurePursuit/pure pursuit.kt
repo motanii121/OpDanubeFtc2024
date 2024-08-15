@@ -30,7 +30,7 @@ class purepursuit {
     var turnpid = PIDF(pidcoefAngle)
     var strafepid = PIDF(PIDCOEF(0.05, 0.0, 0.0, 0.02))
     val tolerance: Double = 7.0
-    val angtolerance: Double = 0.1
+    val angtolerance: Double = 0.17
 
     var busy: Boolean = false
 

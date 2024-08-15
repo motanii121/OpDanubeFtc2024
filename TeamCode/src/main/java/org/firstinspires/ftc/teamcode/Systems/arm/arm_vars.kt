@@ -24,9 +24,9 @@ object arm_vars {
     @JvmField
     var fourbarfinalpos: Double = 0.75
     @JvmField
-    var rarmPreload: Double = 0.75
+    var rarmPreload: Double = 0.72
     @JvmField
-    var larmPreload: Double = 0.13
+    var larmPreload: Double = 0.15
     @JvmField
     var fourbarPreload: Double = 0.95
 

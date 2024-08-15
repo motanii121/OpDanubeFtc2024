@@ -3,10 +3,14 @@ package org.firstinspires.ftc.teamcode.Variables
 import android.graphics.Color
 import com.acmerobotics.dashboard.FtcDashboard
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket
+//import com.acmerobotics.dashboard.FtcDashboard
+//import com.acmerobotics.dashboard.telemetry.TelemetryPacket
 import com.qualcomm.hardware.lynx.LynxModule
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.hardware.HardwareMap
+import com.qualcomm.robotcore.hardware.Servo
 import com.qualcomm.robotcore.hardware.configuration.LynxConstants
+//import com.qualcomm.robotcore.robocol.Command
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.Algorithms.quality_of_life_funcs.autoupdate_tp
@@ -57,7 +61,7 @@ object system_funcs {
     var currentcommand: Command? = null
     lateinit var sensor: ColorSensor
 
-    fun init_teleop(lom_real: LinearOpMode){
+    fun init_teleop(lom_real: LinearOpMode, isauto: Boolean){
         lom = lom_real
         hardwareMap = lom.hardwareMap
 
@@ -87,9 +91,18 @@ object system_funcs {
         telemetryPacket = TelemetryPacket()
 
         init_systems()
-        pipeline = pipeline0()
-        camera = Camera("Webcam 1", OpenCvCameraRotation.UPRIGHT, 640, 480, pipeline, streaming = true, waitForOpen = true)
-        pp = purepursuit()
+        if(isauto){
+            claws.grabauto()
+            pipeline = pipeline0()
+            camera = Camera("Webcam 1", OpenCvCameraRotation.UPRIGHT, 640, 480, pipeline, streaming = true, waitForOpen = true)
+            pp = purepursuit()
+        }
+        else{
+            claws.initpos()
+        }
+        //pipeline = pipeline0()
+        //camera = Camera("Webcam 1", OpenCvCameraRotation.UPRIGHT, 640, 480, pipeline, streaming = true, waitForOpen = true)
+        //pp = purepursuit()
     }
 
     fun init_systems(){
@@ -101,7 +114,22 @@ object system_funcs {
         droneLauncher = Drone_launcher()
         droneLauncher.init()
         claws = Claws()
-        claws.initpos()
+        arm = Arm()
+        arm.init()
+        sensor = ColorSensor()
+        slides = Slides()
+    }
+    fun init_systems_auto(){
+        slides = Slides()
+        localizer = ThreeWheelLocalizer()
+        drivetrain = Drivetrain()
+        drivetrain.init()
+        intake = Intake()
+        intake.init()
+        droneLauncher = Drone_launcher()
+        droneLauncher.init()
+        claws = Claws()
+        claws.grabauto()
         arm = Arm()
         arm.init()
         sensor = ColorSensor()
@@ -116,5 +144,40 @@ object system_funcs {
         expansionHub.clearBulkCache()
         //telemetryPacket.addLine(localizer.robotpose.x.toString() + " " + localizer.robotpose.y.toString() + " " + localizer.robotpose.heading.toString())
         localizer.update()
+    }
+
+    fun init_auto(lom_real: LinearOpMode){
+        lom = lom_real
+        hardwareMap = lom.hardwareMap
+
+        val lynxModules = hardwareMap.getAll(LynxModule::class.java)
+        for (module in lynxModules) {
+            module.bulkCachingMode = LynxModule.BulkCachingMode.MANUAL
+        }
+        if (lynxModules[0].isParent && LynxConstants.isEmbeddedSerialNumber(lynxModules[0].serialNumber)) {
+            controlHub = lynxModules[0]
+            expansionHub = lynxModules[1]
+        } else {
+            controlHub = lynxModules[1]
+            expansionHub = lynxModules[0]
+        }
+        controlHub.setConstant(Color.rgb(221, 168, 255))
+        expansionHub.setConstant(Color.rgb(255, 0,0))
+        //   batteryVoltageSensor = hardwareMap.getAll(PhotonLynxVoltageSensor::class.java).iterator().next()
+
+        dash = FtcDashboard.getInstance()
+        tp = dash.telemetry
+        controller = Controller()
+        autoupdate_tp(tp, "IMEW", "A MIMIR")
+        imew = ThreadedIMU("imu")
+        autoupdate_tp(tp, "IMEW", "AWAKE")
+        imew.init()
+        imew.initThread()
+        telemetryPacket = TelemetryPacket()
+
+        init_systems_auto()
+        pipeline = pipeline0()
+        camera = Camera("Webcam 1", OpenCvCameraRotation.UPRIGHT, 640, 480, pipeline, streaming = true, waitForOpen = true)
+        pp = purepursuit()
     }
 }

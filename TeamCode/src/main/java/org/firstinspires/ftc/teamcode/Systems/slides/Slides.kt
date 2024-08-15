@@ -4,26 +4,32 @@ import com.acmerobotics.dashboard.config.Config
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.Algorithms.PIDF
+import org.firstinspires.ftc.teamcode.CommandBase.commands
 import org.firstinspires.ftc.teamcode.Systems.slides.slides_vars.ltargetposition
 import org.firstinspires.ftc.teamcode.Systems.slides.slides_vars.rtargetposition
 import org.firstinspires.ftc.teamcode.Systems.slides.slides_vars.slideupForce
 import org.firstinspires.ftc.teamcode.Systems.slides.slides_vars.tolerance
+import org.firstinspires.ftc.teamcode.Variables.system_funcs.arm
+import org.firstinspires.ftc.teamcode.Variables.system_funcs.currentcommand
 
 import org.firstinspires.ftc.teamcode.Variables.system_funcs.hardwareMap
 import org.firstinspires.ftc.teamcode.Variables.system_funcs.lom
+import org.firstinspires.ftc.teamcode.Variables.system_funcs.sensor
 import org.firstinspires.ftc.teamcode.Variables.system_funcs.tp
+import org.firstinspires.ftc.teamcode.hardware.Raikoder
+import kotlin.math.abs
 
 
 class Slides {
     val lslide = hardwareMap.dcMotor.get("LSLIDE")
     val rslide = hardwareMap.dcMotor.get("RSLIDE")
-   // val encoder = Encoder("LSLIDE", -1)
-
     //val pos: Int
     //    get() = encoder.pos
 
 
     fun init(){
+        lslide.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
+        rslide.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
         lslide.mode = DcMotor.RunMode.RUN_USING_ENCODER
         rslide.mode = DcMotor.RunMode.RUN_USING_ENCODER
     }

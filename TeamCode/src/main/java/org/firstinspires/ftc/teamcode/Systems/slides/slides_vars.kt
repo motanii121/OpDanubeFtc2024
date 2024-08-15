@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.Systems.slides
 
-import com.acmerobotics.dashboard.config.Config
+//import com.acmerobotics.dashboard.config.Config
 
-@Config
+//@Config
 object slides_vars {
     @JvmField
     var rtargetposition: Double = 0.0
