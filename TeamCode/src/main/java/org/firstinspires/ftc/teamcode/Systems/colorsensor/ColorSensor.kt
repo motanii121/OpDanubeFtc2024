@@ -14,8 +14,8 @@ class ColorSensor {
     val rsensor = hardwareMap.colorSensor.get("RSENSOR")
 
     fun got2pixels(): Boolean{
-        var gotleftpixel = lsensor.red() > 1100
-        var gotrightpixel = rsensor.red() > 800
+        var gotleftpixel = lsensor.red() > 800
+        var gotrightpixel = rsensor.red() > 1100
 
         return gotleftpixel && gotrightpixel
     }

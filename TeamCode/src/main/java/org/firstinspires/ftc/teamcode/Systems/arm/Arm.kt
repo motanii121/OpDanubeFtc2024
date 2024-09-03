@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Systems.arm
 
+import com.acmerobotics.dashboard.config.Config
 import org.firstinspires.ftc.teamcode.Algorithms.motionprofiler
 import org.firstinspires.ftc.teamcode.Algorithms.quality_of_life_funcs.autoupdate_tp
 import org.firstinspires.ftc.teamcode.Systems.arm.arm_vars.fourbarPreload
@@ -11,6 +12,7 @@ import org.firstinspires.ftc.teamcode.Systems.arm.arm_vars.larmUp
 import org.firstinspires.ftc.teamcode.Systems.arm.arm_vars.rarmDown
 import org.firstinspires.ftc.teamcode.Systems.arm.arm_vars.rarmPreload
 import org.firstinspires.ftc.teamcode.Systems.arm.arm_vars.rarmUp
+import org.firstinspires.ftc.teamcode.Systems.arm.mama.fourbarpozitieinitMasa
 import org.firstinspires.ftc.teamcode.Variables.system_funcs.hardwareMap
 import org.firstinspires.ftc.teamcode.Variables.system_funcs.tp
 import org.firstinspires.ftc.teamcode.Variables.system_vars.MPdownAcceleration
@@ -40,7 +42,7 @@ class Arm {
     var isDown = false
 
     fun init(){
-        fourbar.position = 0.4
+        fourbar.position = fourbarpozitieinitMasa
         rarm.position = rarmInit
         larm.position = larmInit
     }
@@ -84,4 +86,10 @@ class Arm {
         fourbar.position = 0.75
     }
 
+}
+
+@Config
+object mama{
+    @JvmField
+    var fourbarpozitieinitMasa:Double = 0.405
 }

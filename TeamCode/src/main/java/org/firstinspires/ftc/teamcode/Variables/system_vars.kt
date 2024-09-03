@@ -7,21 +7,23 @@ object system_vars {
 
     //init
     @JvmField
-    var clawRotateInit: Double = 0.05
+    var clawRotateInit: Double = 0.5
     @JvmField
     var intakeInit: Double = 0.81
 
     @JvmField
     var droneInit: Double = 0.5
     @JvmField
-    var larmInit: Double = 0.35 //0.38
+    var larmInit: Double = 0.31 //0.31;firul rosu /portul 5
+
     @JvmField
-    var rarmInit: Double = 0.53 //0.6
+    var rarmInit: Double = 0.46 //0.46; firul albastru 0.465 putintel mai jos sau 0.47 putin mai sus /portul 4
 
     @JvmField
     var larmUp: Double = 0.20
     @JvmField
     var larmDown: Double = 0.48
+
     @JvmField
     var rarmUp : Double = 0.75
     @JvmField

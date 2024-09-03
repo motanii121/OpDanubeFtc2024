@@ -18,7 +18,7 @@ class Claws {
     fun initpos(){
         lclaw.position = lclawOpenPos
         rclaw.position = rclawOpenPos
-        rotator.position = clawRotateInit
+        rotator.position = 0.48
     }
 
     fun grab(){

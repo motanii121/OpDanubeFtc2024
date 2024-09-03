@@ -16,7 +16,6 @@ import org.firstinspires.ftc.teamcode.Localizer.ThreeWheelLocalizer
 import org.firstinspires.ftc.teamcode.PurePursuit.purepursuit
 import org.firstinspires.ftc.teamcode.Systems.ThreadedIMU
 import org.firstinspires.ftc.teamcode.Systems.camera.Camera
-import org.firstinspires.ftc.teamcode.Systems.camera.Pipeline
 import org.firstinspires.ftc.teamcode.Variables.system_funcs
 import org.firstinspires.ftc.teamcode.Variables.system_funcs.arm
 import org.firstinspires.ftc.teamcode.Variables.system_funcs.camera

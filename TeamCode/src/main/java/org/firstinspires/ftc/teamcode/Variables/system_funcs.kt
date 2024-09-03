@@ -28,7 +28,6 @@ import org.firstinspires.ftc.teamcode.Systems.drone.Drone_launcher
 import org.firstinspires.ftc.teamcode.Systems.intake.Intake
 import org.firstinspires.ftc.teamcode.Systems.slides.Slides
 import org.firstinspires.ftc.teamcode.Systems.ThreadedIMU
-import org.firstinspires.ftc.teamcode.Systems.camera.Pipeline
 import org.firstinspires.ftc.teamcode.Systems.camera.pipeline0
 import org.firstinspires.ftc.teamcode.Systems.colorsensor.ColorSensor
 //import org.firstinspires.ftc.teamcode.Systems.camera.Pipeline

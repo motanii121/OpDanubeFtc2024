@@ -84,9 +84,9 @@ class Drivetrain {
         rbmotor.power = rbPower * equalizercoef * slowdown
     }
 
-    fun gm0drive(headingpid: Double, slow: Double) {
+    fun gm0drive(slow: Double) {
 
-        val slowdown = 1.0 - slow * 0.5
+        val slowdown = 1.0 - slow * 0.64
         rbmotor.direction = DcMotorSimple.Direction.REVERSE
         rfmotor.direction = DcMotorSimple.Direction.REVERSE
 
@@ -102,10 +102,10 @@ class Drivetrain {
         var fieldcentricstrafe = y * Math.sin(heading) + x * Math.cos(heading)
 
         val denominator = max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1.0)
-        val frontLeftPower = (fieldcentricspeed + fieldcentricstrafe + rx + headingpid) / denominator
-        val backLeftPower = (fieldcentricspeed - fieldcentricstrafe + rx + headingpid) / denominator
-        val frontRightPower = (fieldcentricspeed - fieldcentricstrafe - rx - headingpid) / denominator
-        val backRightPower = (fieldcentricspeed + fieldcentricstrafe - rx - headingpid) / denominator
+        val frontLeftPower = (fieldcentricspeed + fieldcentricstrafe + rx) / denominator
+        val backLeftPower = (fieldcentricspeed - fieldcentricstrafe + rx ) / denominator
+        val frontRightPower = (fieldcentricspeed - fieldcentricstrafe - rx ) / denominator
+        val backRightPower = (fieldcentricspeed + fieldcentricstrafe - rx ) / denominator
 
         lfmotor.power = frontLeftPower * slowdown
         lbmotor.power = backLeftPower * slowdown

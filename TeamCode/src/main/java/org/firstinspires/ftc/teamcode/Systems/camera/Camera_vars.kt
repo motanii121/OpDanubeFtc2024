@@ -10,17 +10,17 @@ import org.firstinspires.ftc.teamcode.Autonomous.Vec4vi
 object camera_vars {
 
     @JvmField
-    var blueMinSaturation: Double = 200.0
+    var blueMinSaturation: Double = 80.0
     @JvmField
     var redMinSaturation: Double = 125.0
     @JvmField
     var redMinValue : Double = 40.0
     @JvmField
-    var blueMinValue: Double = 100.0
+    var blueMinValue: Double = 85.0
     @JvmField
     var redMaxHueVariation: Double = 0.5
     @JvmField
-    var blueMaxHueVariation: Double = 0.5
+    var blueMaxHueVariation: Double = 0.7
     @JvmField
     var redHue: Double = 0.0
     @JvmField

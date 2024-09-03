@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.Systems.slides
 
 import com.acmerobotics.dashboard.config.Config
+import com.outoftheboxrobotics.photoncore.hardware.motor.PhotonDcMotor
 import com.qualcomm.robotcore.hardware.DcMotor
+import com.qualcomm.robotcore.hardware.DcMotorEx
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.Algorithms.PIDF
 import org.firstinspires.ftc.teamcode.CommandBase.commands
@@ -23,8 +25,9 @@ import kotlin.math.abs
 class Slides {
     val lslide = hardwareMap.dcMotor.get("LSLIDE")
     val rslide = hardwareMap.dcMotor.get("RSLIDE")
-    //val pos: Int
-    //    get() = encoder.pos
+
+    //val aslide: PhotonDcMotor = hardwareMap.get(DcMotorEx:: class.java, "LSLIDE") as PhotonDcMotor
+
 
 
     fun init(){
@@ -35,8 +38,11 @@ class Slides {
     }
 
     fun run(){
-        rslide.power = lom.gamepad2.right_stick_y.toDouble()
-        lslide.power = -lom.gamepad2.right_stick_y.toDouble()
+        if(abs(lom.gamepad2.left_stick_y) > 0.0001){
+
+            rslide.power = lom.gamepad2.left_stick_y.toDouble()
+            lslide.power = -lom.gamepad2.left_stick_y.toDouble()
+        }
     }
 
     fun up(){

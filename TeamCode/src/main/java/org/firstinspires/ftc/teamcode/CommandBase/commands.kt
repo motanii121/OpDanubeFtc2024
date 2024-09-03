@@ -39,12 +39,16 @@ import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.failsafe
 import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.intermediarytraj0Blue
 import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.intermediarytraj0Red
 import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.intermediarytraj2Red
+import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.intermediarytraj2blue
 import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.park
 import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.redbackdrop
 import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.redpreload
 import org.firstinspires.ftc.teamcode.Pathing.auto_trajectories.stacktodrop
 import org.firstinspires.ftc.teamcode.Systems.arm.arm_vars.fourbarfinalpos
 import org.firstinspires.ftc.teamcode.Systems.arm.arm_vars.fourbarinit
+import org.firstinspires.ftc.teamcode.Systems.arm.arm_vars.larmPozitieIntermediara
+import org.firstinspires.ftc.teamcode.Systems.arm.arm_vars.rarmPozitieIntermediara
+import org.firstinspires.ftc.teamcode.Systems.arm.mama.fourbarpozitieinitMasa
 import org.firstinspires.ftc.teamcode.Systems.camera.pipeline0
 import org.firstinspires.ftc.teamcode.Systems.intake.intake_vars.intakeMotorPower
 import org.firstinspires.ftc.teamcode.Systems.intake.intake_vars.lidClosePos
@@ -61,44 +65,49 @@ import kotlin.math.PI
 object commands{
 
     //MAIN / TELEOP COMMANDS
-
     fun transfer(): Command{
         return SequentialCommand(
-            InstantCommand { claws.rotator.position = 0.05},
+            InstantCommand { claws.rotator.position = 0.48},
             InstantCommand { claws.drop()},
             InstantCommand { arm.goInit() }, //sets the pos of the 2 arm servos
-            InstantCommand { arm.fourbar.position = 0.4 },
-            InstantCommand { claws.rotator.position = 0.05},
-            InstantCommand { intake.intakeServo.position = 0.8},
-            WaitUntilCommand { intake.intakeServo.position == 0.8 },
+            InstantCommand { arm.fourbar.position = 0.405 },
+            InstantCommand { claws.rotator.position = 0.48},
+            InstantCommand { intake.intakeServo.position = 0.81},
+            WaitUntilCommand { intake.intakeServo.position == 0.81 },
             InstantCommand { intake.intakeMotor.power = intakeMotorPower}, //little intake action
             SleepCommand(0.2),
             InstantCommand { intake.stop() },
             InstantCommand { intake.lidServo.position = lidOpenPos },
             SleepCommand(0.3), //insane amount of sleeps bcs testing reasons
-            InstantCommand { arm.fourbar.position = 0.4 }, //dont care that its the same position lol
+            InstantCommand { arm.fourbar.position = 0.405 }, //dont care that its the same position lol
+            InstantCommand { arm.larm.position = larmPozitieIntermediara},
+            InstantCommand { arm.rarm.position = rarmPozitieIntermediara},
+            SleepCommand(0.2),
             InstantCommand { arm.goDown() }, //same as goinit
             SleepCommand(0.25),
             InstantCommand { claws.grab() },
             SleepCommand(0.25),
             InstantCommand { arm.goInit() },
-            SleepCommand(0.3),
-            InstantCommand { intake.lidServo.position = lidClosePos }
+            SleepCommand(0.6),
+            InstantCommand { intake.lidServo.position = lidClosePos },
+            InstantCommand { arm.fourbar.position = fourbarpozitieinitMasa}
         )
     }
 
     fun failsafe(): Command{
         return SequentialCommand(
             InstantCommand {arm.goInit()},
-            InstantCommand { arm.fourbar.position = 0.4}
+            InstantCommand { arm.fourbar.position = 0.405}
         )
     }
 
     fun goup(): Command{
         return SequentialCommand(
+            InstantCommand { arm.fourbar.position =  0.79},
+            SleepCommand(0.05),
             InstantCommand { arm.goUp() },
-            SleepCommand(0.1),
-            InstantCommand { arm.fourbar.position =  0.87}
+            SleepCommand(0.2),
+            InstantCommand {arm.fourbar.position = 0.9}
         )
     }
 
@@ -107,11 +116,11 @@ object commands{
             SleepCommand(0.2),
             InstantCommand { claws.drop() },
             SleepCommand(0.1),
-            InstantCommand { claws.rotator.position = 0.05},
-            lowerslidesteleop(slides.lslide.currentPosition > 1),
+            InstantCommand { claws.rotator.position = 0.48},//0.5
+            lowerslidesteleop(),
             //InstantCommand { arm.fourbar.position = 0.4},
             InstantCommand { arm.goInit() },
-            InstantCommand { arm.fourbar.position = 0.4},
+            InstantCommand { arm.fourbar.position = 0.405},
             )
     }
 
@@ -133,14 +142,9 @@ object commands{
         )
     }
 
-    fun lowerslidesteleop(areslidesup: Boolean): Command{
-
-        return if(areslidesup)
-            SequentialCommand(
-                RunUntilCommand(InstantCommand{ slides.down() }, InstantCommand{ slides.lslide.currentPosition < 10 })
-            )
-        else
-            InstantCommand{}
+    fun lowerslidesteleop(): Command{
+        return SequentialCommand(
+        )
     }
 
     fun lowerslides(i: Int): Command{
@@ -158,6 +162,7 @@ object commands{
         )
     }
 
+
     //PRELOADS
     fun porpl(): Command{
         return SequentialCommand(
@@ -171,7 +176,7 @@ object commands{
             InstantCommand { arm.goPreloadDown()},
             SleepCommand(0.5),
             InstantCommand { claws.droppurple() },
-            //InstantCommand { arm.fourbar.position = 0.65},
+            //InstantCommand { arm. position = 0.65},
             InstantCommand { arm.goUp()},
             SleepCommand(0.5),
         )
@@ -260,8 +265,8 @@ object auto_sequences_red{
             //straighten wrist
             InstantCommand { arm.goPreloadDown()},
             InstantCommand { arm.fourbar.position = 1.0 },
-            SleepCommand(0.5),
-            InstantCommand{claws.rotator.position = 0.05},
+            SleepCommand(1.0),
+            InstantCommand{claws.rotator.position = 0.48},
 
             //drop purple
             InstantCommand { claws.droppurple() },
@@ -269,7 +274,7 @@ object auto_sequences_red{
 
             //prepare for yellow
             InstantCommand { arm.goUp()},
-            InstantCommand { arm.fourbar.position = 0.95},
+            InstantCommand { arm.fourbar.position = 0.87},
             SleepCommand(0.4),
 
             //move out of the way to not de-score purple
@@ -280,6 +285,9 @@ object auto_sequences_red{
             follow(PreloadtoBack0Red),
 
             //drop yellow
+            InstantCommand{arm.goUp()},
+            InstantCommand{arm.goUp()},
+
             yellowsequence(),
 
             //park
@@ -305,22 +313,23 @@ object auto_sequences_red{
             //put arm down and straighten wrist
             InstantCommand { arm.goPreloadDown()},
             InstantCommand { arm.fourbar.position = 1.0 },
-            SleepCommand(0.5),
-            InstantCommand{claws.rotator.position = 0.05},
+            SleepCommand(1.0),
+            InstantCommand{claws.rotator.position = 0.48},
 
             //drop
             InstantCommand { claws.droppurple() },
             SleepCommand(0.3),
-
             //prepare for yellow
             InstantCommand { arm.goUp()},
-            InstantCommand { arm.fourbar.position = 0.95},
+            InstantCommand { arm.fourbar.position = 0.87},
+            InstantCommand { arm.goUp()},
             SleepCommand(0.4),
 
             //go to backboard
             follow(PreloadtoBack1Red),
 
             //put yellow
+            InstantCommand { arm.goUp()},
             yellowsequence(),
 
             //reset and park
@@ -341,6 +350,7 @@ object auto_sequences_red{
 
             //go to preload 2 (towards trusses)
             follow(Preload2Red),
+            SleepCommand(0.2),
 
             //allign to the spike mark, cannot do it in 1 path because otherwise i'd hit the truss
             follow(anotherintermediarytraj2Red),
@@ -350,23 +360,27 @@ object auto_sequences_red{
             InstantCommand { arm.goPreloadDown()},
             InstantCommand { arm.fourbar.position = 1.0 },
             SleepCommand(0.5),
-            InstantCommand{claws.rotator.position = 0.05},
+            InstantCommand{claws.rotator.position = 0.48},
 
             //drop purple
             InstantCommand { claws.droppurple() },
-            SleepCommand(0.3),
+            SleepCommand(1.0),
+            SleepCommand(0.8),
 
             //setup for yellow
             InstantCommand { arm.goUp()},
-            InstantCommand { arm.fourbar.position = 0.95},
+            InstantCommand { arm.fourbar.position = 0.87},
+            SleepCommand(0.5),
             SleepCommand(0.4),
 
             //due to the fact that i've got an imperfect pid paired with a pid to point, going straight up to the backdrop would
             //make me hit it, so i make the robot go to an intermediary point between the two to soften the pathing
+            InstantCommand { arm.goUp()},
             follow(intermediarytraj2Red),
             SleepCommand(0.2),
 
             //go to backdrop
+            InstantCommand { arm.goUp()},
             follow(Preload2Red),
 
             //drop yellow
@@ -398,7 +412,7 @@ object auto_sequences_blue{
             InstantCommand { arm.goPreloadDown()},
             InstantCommand { arm.fourbar.position = 1.0 },
             SleepCommand(0.5),
-            InstantCommand{claws.rotator.position = 0.05},
+            InstantCommand{claws.rotator.position = 0.48},
 
             //drop purple
             InstantCommand { claws.droppurple() },
@@ -443,7 +457,7 @@ object auto_sequences_blue{
             InstantCommand { arm.goPreloadDown()},
             InstantCommand { arm.fourbar.position = 1.0 },
             SleepCommand(0.5),
-            InstantCommand{claws.rotator.position = 0.05},
+            InstantCommand{claws.rotator.position = 0.48},
 
             //drop
             InstantCommand { claws.droppurple() },
@@ -487,7 +501,7 @@ object auto_sequences_blue{
             InstantCommand { arm.goPreloadDown()},
             InstantCommand { arm.fourbar.position = 1.0 },
             SleepCommand(0.5),
-            InstantCommand{claws.rotator.position = 0.05},
+            InstantCommand{claws.rotator.position = 0.48},
 
             //drop purple
             InstantCommand { claws.droppurple() },
@@ -500,7 +514,7 @@ object auto_sequences_blue{
 
             //due to the fact that i've got an imperfect pid paired with a pid to point, going straight up to the backdrop would
             //make me hit it, so i make the robot go to an intermediary point between the two to soften the pathing
-            follow(anotherintermediarytraj2blue),
+            follow(intermediarytraj2blue),
             SleepCommand(0.2),
 
             //go to backdrop
@@ -514,4 +528,12 @@ object auto_sequences_blue{
         )
     }
 
+}
+
+object parkblue{
+    fun parkblue(): Command{
+        return SequentialCommand(
+            follow(Trajectory(Pose(0.0, 0.0, 0.0), Pose(0.0, -85.0, 0.0)))
+        )
+    }
 }

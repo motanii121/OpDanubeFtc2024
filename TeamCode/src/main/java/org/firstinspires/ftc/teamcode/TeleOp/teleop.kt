@@ -129,6 +129,8 @@ class teleopHAIDEEEEEEEEE: LinearOpMode(){
     var x: Int = 0
     override fun runOpMode() {
         init_teleop(this, false)
+        var isxing: Boolean = false
+        var ispsing: Boolean = false
         val sensor = ColorSensor()
         var ep = ElapsedTime()
         var RAAAAAAAAAH: Boolean = false
@@ -143,8 +145,6 @@ class teleopHAIDEEEEEEEEE: LinearOpMode(){
         var islidup: Boolean = false
         var isfailsafing = false
         var k = 0
-        var headingcorrectionpid = PIDF(PIDCOEF(koef.p, koef.i, koef.d, koef.f))
-        var targetheading: Double = 0.0
         currentcommand = null
         waitForStart()
 
@@ -195,15 +195,7 @@ class teleopHAIDEEEEEEEEE: LinearOpMode(){
             raaaaaaaah = gamepad2.x
 
             //DRIVETRAIN
-            if(abs(gamepad1.right_stick_x) > 0.05){
-                targetheading = imew.yaw
-                ep.reset()
-            } else {
-                while(ep.milliseconds() <= 200){
-                    targetheading = imew.yaw
-                }
-            }
-            drivetrain.gm0drive(- if(abs(angDiff(targetheading, imew.yaw)) >= angletolerance) headingcorrectionpid.update(angDiff(targetheading, imew.yaw)) else 0.0,gamepad1.left_trigger.toDouble())
+            drivetrain.gm0drive(gamepad1.left_trigger.toDouble())
 
             //INTAKE
             if(gamepad1.right_bumper && !isintaking) {
@@ -212,7 +204,7 @@ class teleopHAIDEEEEEEEEE: LinearOpMode(){
             }
 
             if(gamepad1.left_bumper && !isintaking2) {
-                intake.intakeMotor.power = -1.0
+                intake.intakeMotor.power = -0.8
             }
 
             if((!gamepad1.left_bumper && isintaking2) || (!gamepad1.right_bumper && isintaking)){
@@ -240,7 +232,7 @@ class teleopHAIDEEEEEEEEE: LinearOpMode(){
 
             //INTAKE POS
             if(gamepad1.b && !isposchanged){
-                autoupdate_tp(tp, "alo intakepos", "daaaaaa")
+                //autoupdate_tp(tp, "alo intakepos", "daaaaaa")
                 intake.changepos()
             }
             isposchanged = gamepad1.b
@@ -250,36 +242,34 @@ class teleopHAIDEEEEEEEEE: LinearOpMode(){
             }
             isnotinitpos = gamepad1.a
 
-            if (arm.isUp) {
+            /*if (arm.isUp) {
                 slides.run()
             } else if (sensor.got2pixels()) {
-                if(abs(gamepad2.right_stick_y) > 0.01) {
+                if(abs(gamepad2.left_stick_y) > 0.01) {
                     currentcommand = commands.transfer()
                 }
             }
+             */
 
+            slides.run()
 
             if(gamepad2.left_trigger > 0.6 && !isnotrotatingleft && arm.isUp){
                 claws.rotator.position += 0.15
-                if(claws.rotator.position > clawRotateMaxPos){
-                    claws.rotator.position = clawRotateInit
+                if(claws.rotator.position > 1.0){
+                    claws.rotator.position = 0.5
                 }
             }
             isnotrotatingleft = gamepad2.left_trigger > 0.6
 
             if(gamepad2.right_trigger > 0.6 && !isnotrotatingright && arm.isUp){
-                if(claws.rotator.position >  clawRotateInit){
+                if(claws.rotator.position >  0.0){
                     claws.rotator.position -= 0.15
+                    if(claws.rotator.position < 0.15){
+                        claws.rotator.position = 0.0
+                    }
                 }
             }
             isnotrotatingright = gamepad2.right_trigger > 0.6
-
-            if(gamepad2.dpad_down && !ishanging && arm.isUp) {
-                slides.lslide.power = -1.0
-                slides.rslide.power = 1.0
-                sleep(3000)
-            }
-            ishanging = gamepad2.dpad_down
 
             if(gamepad2.dpad_left && !islidup){
                 if(k == 0){
@@ -298,12 +288,18 @@ class teleopHAIDEEEEEEEEE: LinearOpMode(){
             }
             isfailsafing = gamepad2.triangle
 
+            if(gamepad2.ps && gamepad2.a && !ispsing && !isxing){
+                currentcommand = commands.transfer()
+            }
+            ispsing = gamepad2.ps
+            isxing = gamepad2.x
+
             if(currentcommand != null){
                 if(currentcommand!!.run(telemetryPacket)){
                     currentcommand = null
                 }
             }
-            autoupdate_tp("LSLIDE", slides.lslide.currentPosition)
+           // autoupdate_tp("LSLIDE", slides.lslide.currentPosition)
             update()
         }
     }
@@ -319,30 +315,10 @@ class teleopcapac: LinearOpMode(){
         var targetheading: Double = 0.0
         var headingcorrectionpid = PIDF(PIDCOEF(koef.p, koef.i, koef.d, koef.f))
         waitForStart()
-        camera.stop()
         while(!isStopRequested){
-
-            if(abs(gamepad1.right_stick_x) > 0.05){
-                targetheading = imew.yaw
-                ep.reset()
-            } else {
-                while(ep.milliseconds() <= 200){
-                    targetheading = imew.yaw
-                }
-            }
-            //autoupdate_tp("curyaw", imew.yaw)
-            //autoupdate_tp("target", targetheading)
-            //autoupdate_tp("diff", angDiff(targetheading, imew.yaw))
-            //autoupdate_tp("correction", headingcorrectionpid.update(angDiff(targetheading, imew.yaw)))
-            drivetrain.autodrive(
-                hypot(-gamepad1.left_stick_x.toDouble(), gamepad1.left_stick_y.toDouble() ),
-                -gamepad1.right_stick_x.toDouble() - if(abs(angDiff(targetheading, imew.yaw)) >= angletolerance) headingcorrectionpid.update(angDiff(targetheading, imew.yaw)) else 0.0,
-                atan2(gamepad1.left_stick_y.toDouble(), gamepad1.left_stick_x.toDouble()) + WHATABURGER,
-                gamepad1.left_trigger.toDouble())
+            claws.rotator.position = 0.48
             update()
         }
-
-
     }
 }
 
